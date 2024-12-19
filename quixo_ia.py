@@ -72,23 +72,23 @@ class QuixoIA(Quixo):
                 return coup_gagnant_adversaire
         return None
     
-        def jouer_un_coup(self, joueur):
-            if joueur not in ("X", "O"):
-                raise QuixoError('Le symbole doit être "X" ou "O".')
-            if self.partie_terminée():
-                raise QuixoError("La partie est déjà terminée.")
+    def jouer_un_coup(self, joueur):
+        if joueur not in ("X", "O"):
+            raise QuixoError('Le symbole doit être "X" ou "O".')
+        if self.partie_terminée():
+            raise QuixoError("La partie est déjà terminée.")
 
-            coup_vain = self.trouver_un_coup_vain(joueur)
-            if coup_vain:
-                self.plateau.insérer_un_cube(joueur, coup_vain['origine'], coup_vain['direction'])
-                return coup_vain
+        coup_vain = self.trouver_un_coup_vain(joueur)
+        if coup_vain:
+            self.plateau.insérer_un_cube(joueur, coup_vain['origine'], coup_vain['direction'])
+            return coup_vain
 
-            coup_bloc = self.trouver_un_coup_bloc(joueur)
-            if coup_bloc:
-                self.plateau.insérer_un_cube(joueur, coup_bloc['origine'], coup_bloc['direction'])
-                return coup_bloc
+        coup_bloc = self.trouver_un_coup_bloc(joueur)
+        if coup_bloc:
+            self.plateau.insérer_un_cube(joueur, coup_bloc['origine'], coup_bloc['direction'])
+            return coup_bloc
 
-            coups_possibles = self.lister_les_coups_possibles(self.plateau, joueur)
-            coup = random.choice(coups_possibles)
-            self.plateau.insérer_un_cube(joueur, coup['origine'], coup['direction'])
-            return coup
+        coups_possibles = self.lister_les_coups_possibles(self.plateau, joueur)
+        coup = random.choice(coups_possibles)
+        self.plateau.insérer_un_cube(joueur, coup['origine'], coup['direction'])
+        return coup
