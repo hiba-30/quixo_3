@@ -148,7 +148,8 @@ class Plateau:
             cube (str): La valeur du cube à insérer, soit "X" ou "O".
             origine (list[int]): La position [x, y] d'origine du cube à insérer.
         """
-
+        if origine[1] == 5:
+            raise QuixoError("Le cube ne peut pas être insérer dans cette direction.")
         for i in range(origine[1], 5):
             self[origine[0], i] = self[origine[0], i + 1]
         self[origine[0], 5] = cube
@@ -161,7 +162,8 @@ class Plateau:
             cube (str): La valeur du cube à insérer, soit "X" ou "O".
             origine (list[int]): La position [x, y] d'origine du cube à insérer.
         """
-
+        if origine[1] == 1:
+            raise QuixoError("Le cube ne peut pas être insérer dans cette direction.")
         for i in range(origine[1], 1, -1):
             self[origine[0], i] = self[origine[0], i - 1]
         self[origine[0], 1] = cube
@@ -173,7 +175,8 @@ class Plateau:
             cube (str): La valeur du cube à insérer, soit "X" ou "O".
             origine (list[int]): La position [x, y] d'origine du cube à insérer.
         """
-
+        if origine[0] == 1:
+            raise QuixoError("Le cube ne peut pas être insérer dans cette direction.")
         for i in range(origine[0], 1, -1):
             self[i, origine[1]] = self[i - 1, origine[1]]
         self[1, origine[1]] = cube
@@ -185,7 +188,68 @@ class Plateau:
             cube (str): La valeur du cube à insérer, soit "X" ou "O".
             origine (list[int]): La position [x, y] d'origine du cube à insérer.
         """
-
+        if origine[0] == 5:
+            raise QuixoError("Le cube ne peut pas être insérer dans cette direction.")
         for i in range(origine[0], 5):
             self[i, origine[1]] = self[i + 1, origine[1]]
         self[5, origine[1]] = cube
+    def compter_lignes(self, joueur, longueur):
+        """
+        Compte le nombre de groupes de cubes d'une certaine longueur appartenant à un joueur donné 
+        sur une ligne, une colonne ou une diagonale.
+
+        :param joueur: "X" ou "O" pour identifier le joueur.
+        :param longueur: Longueur des groupes à analyser (2, 3, 4, ou 5).
+        :return: Nombre total de groupes trouvés.
+        """
+        total_groupes = 0
+
+        for ligne in range(1, 6):
+            contenu = [self[col, ligne] for col in range(1, 6)]
+            if contenu.count(joueur) == longueur:
+                total_groupes += 1
+
+        for col in range(1, 6):
+            contenu = [self[col, ligne] for ligne in range(1, 6)]
+            if contenu.count(joueur) == longueur:
+                total_groupes += 1
+
+        diagonale_principale = [self[i, i] for i in range(1, 6)]
+        diagonale_secondaire = [self[i, 6 - i] for i in range(1, 6)]
+        
+        if diagonale_principale.count(joueur) == longueur:
+            total_groupes += 1
+        if diagonale_secondaire.count(joueur) == longueur:
+            total_groupes += 1
+
+        return total_groupes
+
+    def simuler_coup(self,cube,origine, direction):
+        """
+        Simule un coup en déplaçant un cube depuis une position donnée dans une direction donnée.
+        
+        :param x: Colonne d'origine du cube (1 à 5).
+        :param y: Ligne d'origine du cube (1 à 5).
+        :param direction: Direction du déplacement ("haut", "bas", "gauche", "droite").
+        :param joueur: Le joueur effectuant le coup ("X" ou "O").
+        :return: Une nouvelle instance de Plateau représentant l'état simulé du plateau après le coup.
+        :raises QuixoError: Si les paramètres du coup sont invalides.
+        """
+        plateau_simule  =  Plateau(self.état_plateau())
+
+        plateau_simule.insérer_un_cube(cube,origine, direction)
+
+        return plateau_simule
+    
+    def partie_terminée(self):
+        """
+        Vérifie si la partie est terminée et identifie le vainqueur éventuel.
+
+        :return: "X", "O" si un joueur a gagné, ou None si la partie n'est pas encore terminée.
+        """
+        if self.compter_lignes("X", 5) > 0:
+            return "X"
+        if self.compter_lignes("O", 5) > 0:
+            return "O"
+        
+        return None
